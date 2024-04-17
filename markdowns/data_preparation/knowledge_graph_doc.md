@@ -1,0 +1,1 @@
+We will write a function to insert documents, their chunks, and embeddings into Neo4j. We model each document as a node, each chunk as a node, and store embeddings as properties or separate nodes depending on your preference.

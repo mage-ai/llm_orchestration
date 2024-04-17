@@ -11,7 +11,7 @@ blocks:
   language: python
   name: rag/data_preparation/setup
   retry_config: null
-  status: updated
+  status: executed
   timeout: null
   type: custom
   upstream_blocks: []
@@ -66,13 +66,13 @@ blocks:
   language: python
   name: chunking/sentences
   retry_config: null
-  status: updated
+  status: executed
   timeout: null
   type: transformer
   upstream_blocks:
   - rag/data_preparation/distribute_files
   uuid: chunking/sentences
-- all_upstream_blocks_executed: false
+- all_upstream_blocks_executed: true
   color: null
   configuration: {}
   downstream_blocks:
@@ -84,7 +84,7 @@ blocks:
   language: python
   name: tokenization/speech
   retry_config: null
-  status: executed
+  status: updated
   timeout: null
   type: transformer
   upstream_blocks:
@@ -126,7 +126,7 @@ blocks:
   upstream_blocks:
   - embedding/batches
   uuid: data_preparation/reduce/embeddings
-- all_upstream_blocks_executed: false
+- all_upstream_blocks_executed: true
   color: null
   configuration:
     reduce_output: true
@@ -182,6 +182,21 @@ blocks:
   - data_preparation/reduce/embeddings
   - data_preparation/reduce/tokenization
   uuid: combine_reduced_output
+- all_upstream_blocks_executed: true
+  color: null
+  configuration: {}
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: markdown
+  name: data_preparation/knowledge_graph_doc
+  retry_config: null
+  status: updated
+  timeout: null
+  type: markdown
+  upstream_blocks: []
+  uuid: data_preparation/knowledge_graph_doc
 - all_upstream_blocks_executed: false
   color: null
   configuration:
@@ -210,7 +225,7 @@ blocks:
   language: python
   name: data_preparation/vector_database/pgvector
   retry_config: null
-  status: updated
+  status: executed
   timeout: null
   type: data_exporter
   upstream_blocks:
@@ -220,7 +235,7 @@ cache_block_output_in_memory: false
 callbacks: []
 concurrency_config: {}
 conditionals:
-- all_upstream_blocks_executed: true
+- all_upstream_blocks_executed: false
   color: null
   configuration: {}
   downstream_blocks: []
@@ -228,13 +243,14 @@ conditionals:
   executor_type: local_python
   has_callback: false
   language: python
-  name: data_preparation/transformers
+  name: data_preparation/embeddings
   retry_config: null
   status: updated
   timeout: null
   type: conditional
-  upstream_blocks: []
-  uuid: data_preparation/transformers
+  upstream_blocks:
+  - embedding/batches
+  uuid: data_preparation/embeddings
 - all_upstream_blocks_executed: false
   color: null
   configuration: {}

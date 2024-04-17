@@ -42,6 +42,6 @@ def transform(file_paths: List[str], *args, **kwargs):
         with open(file_path, 'r') as f:
             text = f.read()
             chunks = chunk_sentences(nlp, text)
-            processed_texts.append(chunks)
+            processed_texts.append([file_path, chunks])
 
     return [processed_texts]

@@ -1,0 +1,12 @@
+inputs:
+  query:
+    style:
+      multiline: true
+    type: text_field
+layout:
+- - variable: query
+    width: 1
+variables:
+  query:
+    input: query
+    name: Query

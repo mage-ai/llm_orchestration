@@ -1,15 +1,6 @@
 from typing import List
 
 
-# def part_of_speech(nlp, chunks):
-#     tokenized_chunks = []
-#     for chunk in chunks:
-#         doc = nlp(chunk)
-#         tokens = [(token.text, token.pos_) for token in doc]
-#         tokenized_chunks.append(tokens)
-#     return tokenized_chunks
-
-
 def tokenize_chunks(nlp, chunks):
     tokenized_chunks = []
     for chunk in chunks:
@@ -38,10 +29,7 @@ def transform(chunks_for_documents: List[List[str]], *args, **kwargs):
         Tokens = [[...], [...]]
     """
 
-    tokens_for_chunks_for_documents = [tokenize_chunks(nlp, chunks) for chunks in chunks_for_documents]
-
-    print(len(chunks_for_documents[0]))  # The 1st document has 21 chunks
-    print(len(tokens_for_chunks_for_documents[0][0]))  # The 1st chunk for the 1st document has 40 tokens
+    tokens_for_chunks_for_documents = [[file_path, tokenize_chunks(nlp, chunks)] for file_path, chunks in chunks_for_documents]
 
     return [
         tokens_for_chunks_for_documents,

@@ -1,48 +1,41 @@
-def create_nodes_and_relationships(driver, chunks, tokenized_chunks, embeddings):
+from typing import List
+from neo4j import Driver
+
+def save_to_neo4j(driver: Driver, document_id: str, chunk_text: str, embeddings: List[float]):
     with driver.session() as session:
-        for i, chunk in enumerate(chunks):
-            # First, add a chunk node
-            session.run("MERGE (c:Chunk {text: $chunkText})", chunkText=chunk)
+        # Assuming each call to this function deals with a single chunk of text,
+        # and file_path acts as a unique identifier for the document.
+        # The embeddings parameter represents embeddings for this single chunk.
 
-            # For each sentence in the tokenized chunk, add a sentence node,
-            # then link it to the chunk, and to its corresponding embedding.
-            for j, sentence in enumerate(tokenized_chunks[i]):
-                sentenceText = sentence
-                embeddingVector = embeddings[i][j]  # Access embedding based on indices
-                
-                # Transactions to create Sentence and Embedding nodes, and relations
-                session.run("""
-                MATCH (c:Chunk {text: $chunkText})
-                MERGE (s:Sentence {text: $sentenceText})
-                MERGE (c)-[:CONTAINS]->(s)
-                
-                // For every sentence, create an Embedding with a unique ID
-                // Here, using a combination of chunk and sentence indices to form an ID
-                MERGE (e:Embedding {id: $embeddingId})
-                ON CREATE SET e.vector = $vector
-                
-                MERGE (s)-[:HAS_EMBEDDING]->(e)
-                """, 
-                chunkText=chunk, 
-                sentenceText=sentenceText, 
-                embeddingId=f"emb_{i}_{j}", 
-                vector=embeddingVector)
+        # Create or find a Document node based on the file_path (acting as a unique document identifier).
+        session.write_transaction(lambda tx: tx.run(
+            """
+            MERGE (d:Document {document_id: $document_id})
+            ON CREATE SET d.document_id = $document_id
+            RETURN d
+            """,
+            document_id=document_id
+        ))
 
+        # Create a Chunk node with its embeddings and relate it to the Document node.
+        session.write_transaction(lambda tx: tx.run(
+            """
+            MATCH (d:Document {document_id: $document_id})
+            CREATE (c:Chunk {text: $chunk_text, embedding: $embedding})
+            CREATE (d)-[:CONTAINS]->(c)
+            """,
+            document_id=document_id,
+            chunk_text=chunk_text,
+            embedding=embeddings  # Assuming embeddings is a list of floats; Neo4j supports list properties.
+        ))
 
 @data_exporter
 def export(data, *args, **kwargs):
-    neo4j_driver = list(kwargs.get('factory_items_mapping').values())[0][0]
-    # Level 0 index: 
-        # Index 0: chunk
-        # Index 1: tokenized_chunk
-        # Index 2: embedding
-    # Level 1 index:
-        # Index 0: Document 1
-        # Index 1: Document 2
-        # Index 2: Document 3
-    # Level 2 index:
-        # Index 0: only
+    driver = list(kwargs.get('factory_items_mapping').values())[0][0]
 
-    chunks_for_documents, tokens_for_chunks, embeddings_for_tokens = data
+    chunks_for_documents, tokens_for_chunks, embeddings_for_tokens_for_chunks_for_documents = data
 
-    # create_nodes_and_relationships(neo4j_driver, chunks, tokens_for_chunks, embeddings_for_tokens)
+    for chunks_for_document, embeddings_for_tokens_for_chunks in zip(chunks_for_documents, embeddings_for_tokens_for_chunks_for_documents):
+        file_path, cd_arr = chunks_for_document
+        for chunk, embeddings_for_tokens_for_chunk in zip(cd_arr, embeddings_for_tokens_for_chunks[1]):
+            save_to_neo4j(driver, file_path, chunk, embeddings_for_tokens_for_chunk)
