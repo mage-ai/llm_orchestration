@@ -7,9 +7,16 @@ def transform(documents: List[List[Union[List[str], str, Dict]]], *args, **kwarg
 
     arr = []
 
-    for tokenized_chunks, document_id, document in documents:        
+    for tokenized_chunks, document_id, document in documents:    
+        vectors = []
+        for tokens in tokenized_chunks:
+            vector = model.encode(tokens)
+            print('WTF0', len(vector))
+            print('WTF1', vector)
+            vectors.append(vector[0])
+
         arr.append([
-            [model.encode(tokens)[0] for tokens in tokenized_chunks],
+            vectors,
             document_id,
             document,
         ])

@@ -28,5 +28,5 @@ def evenly_distribute_to_buckets(input_list, num_buckets):
 @transformer
 def transform(data, *args, **kwargs):
     return [
-        evenly_distribute_to_buckets(data, 1000)[100:102],
+        evenly_distribute_to_buckets(data, 100),
     ]

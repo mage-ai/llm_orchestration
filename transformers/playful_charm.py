@@ -17,6 +17,8 @@ def chunk_sentences(nlp, text: str) -> List[str]:
 def transform(documents: List[Dict], *args, **kwargs):
     nlp = list(kwargs.get('factory_items_mapping').values())[0][0]
 
+    print('Documents: ', len(documents))
+
     return [
         [[
             chunk_sentences(nlp, document['text']),
