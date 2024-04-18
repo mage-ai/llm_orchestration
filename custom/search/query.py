@@ -1,4 +1,6 @@
 import ast  # For safely evaluating strings containing Python literals
+import os
+
 import faiss
 import numpy as np
 import pandas as pd
@@ -60,7 +62,10 @@ def rag_query(driver, query_vector, faiss_index, chunk_texts, k=2):
 
     with driver.session() as session:
         for i in range(k):
-            index = I[0][i]  # Index in the Faiss result to find the chunk index
+            obj = I[0]
+            if i >= len(obj):
+                i = -1
+            index = obj[i]  # Index in the Faiss result to find the chunk index
             
             chunk_text = chunk_texts[index]  # Getting chunk_text using the index
 
@@ -78,26 +83,37 @@ def rag_query(driver, query_vector, faiss_index, chunk_texts, k=2):
 
 @custom
 def retrieve(*args, **kwargs):
-    neo4j_driver, postgres_conn = kwargs.get('factory_items_mapping')['database/drivers']
+    driver, postgres_conn = kwargs.get('factory_items_mapping')['database/drivers']
     model = kwargs.get('factory_items_mapping')['data_preparation/embeddings'][0]
     
+    k_nearest_neighbors = kwargs.get('k_nearest_neighbors')
     query = kwargs.get('query')
     if not query:
         raise Exception('Query is required')
 
     query_vector = create_query_vector(model, query)
     index, chunk_texts, _document_ids = create_faiss_index(postgres_conn)
-    nodes = rag_query(neo4j_driver, query_vector, index, chunk_texts)
+    nodes = rag_query(
+        driver, 
+        query_vector, 
+        index, 
+        chunk_texts, 
+        k=k_nearest_neighbors,
+    )
 
     arr = []
     for node in nodes:
         document_id = node['documentID']
+        document = document_id
+        
+        if os.path.exists(document_id):
+            with open(document_id, 'r') as f:
+                document = f.read()
 
-        with open(document_id, 'r') as f:
-            arr.append(dict(
-                chunk=node['chunk'],
-                document=f.read(),
-                document_id=document_id,
-            ))
+        arr.append(dict(
+            chunk=node['chunk'],
+            document=document,
+            document_id=document_id,
+        ))
     
     return arr

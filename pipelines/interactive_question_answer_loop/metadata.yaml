@@ -9,7 +9,7 @@ blocks:
   language: python
   name: search/query
   retry_config: null
-  status: failed
+  status: executed
   timeout: null
   type: custom
   upstream_blocks: []
@@ -18,7 +18,7 @@ cache_block_output_in_memory: false
 callbacks: []
 concurrency_config: {}
 conditionals:
-- all_upstream_blocks_executed: false
+- all_upstream_blocks_executed: true
   color: null
   configuration:
     file_source:
@@ -36,7 +36,7 @@ conditionals:
   upstream_blocks:
   - search/query
   uuid: database/drivers
-- all_upstream_blocks_executed: false
+- all_upstream_blocks_executed: true
   color: null
   configuration:
     file_source:

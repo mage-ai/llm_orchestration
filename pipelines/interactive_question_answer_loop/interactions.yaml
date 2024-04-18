@@ -2,7 +2,10 @@ blocks:
   search/query:
   - description: Now we can implement the core RAG functionality to retrieve relevant
       context for a given query.
+    layout: []
     name: Implement RAG query
+    permissions: []
     uuid: query.yaml
+    variables: {}
 layout: []
 permissions: []

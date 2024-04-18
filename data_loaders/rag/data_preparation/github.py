@@ -39,6 +39,10 @@ def transform_custom(*args, **kwargs):
     local_dir = os.path.join(get_repo_path(), 'documents', 'code')
     download_repo(repo_url, local_dir)
 
+    subfolder = kwargs.get('subfolder')
+    if subfolder:
+        local_dir = os.path.join(local_dir, subfolder)
+
     return [
         local_dir,
     ]

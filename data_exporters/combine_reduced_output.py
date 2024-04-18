@@ -1,5 +1,5 @@
 @data_exporter
-def export_data(chunks_for_documents, embeddings_for_tokens_for_chunks, tokens_for_chunks_for_documents, **kwargs):
+def export_data(chunks_for_documents, tokens_for_chunks_for_documents, embeddings_for_tokens_for_chunks, **kwargs):
     chunks = []
     for chunks_for_document in chunks_for_documents:
         chunks += chunks_for_document

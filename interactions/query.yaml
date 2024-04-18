@@ -1,12 +1,30 @@
 inputs:
-  query:
+  number:
     style:
+      input_type: number
+    type: text_field
+  query:
+    options: []
+    style:
+      input_type: null
       multiline: true
     type: text_field
 layout:
 - - variable: query
     width: 1
+- - variable: k_nearest_neighbors
+    width: 1
 variables:
+  k_nearest_neighbors:
+    description: K nearest neighbors
+    input: number
+    name: K
+    types:
+    - integer
   query:
+    description: null
     input: query
     name: Query
+    required: null
+    types: []
+    uuid: null
