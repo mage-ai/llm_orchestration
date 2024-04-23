@@ -106,7 +106,7 @@ blocks:
   language: python
   name: chunking/semantic
   retry_config: null
-  status: executed
+  status: updated
   timeout: null
   type: transformer
   upstream_blocks:

@@ -17,7 +17,7 @@ def get_train_transform(
     transform_text: str = False,
     verbose: int = 1,
     vocab_size: str = None,
-) -> Tuple[spm.SentencePieceProcessor, str, Union[None, List[str]]]:
+) -> Dict:
     """
     model_type:
         bpe
@@ -59,7 +59,12 @@ def get_train_transform(
     if transform_text:
         tokens = model.encode_as_pieces(transform_text)
 
-    return model, model_file_path, tokens
+    return dict(
+        dictionary=dictionary,
+        model=lda_model,
+        paths=[model_file_path],
+        tokens=tokens,
+    )
 
 
 def __setup_files(execution_partition: str = None) -> str:

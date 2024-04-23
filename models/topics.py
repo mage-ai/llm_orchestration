@@ -1,6 +1,6 @@
 import math
 import os
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 
 import spacy
 from gensim import corpora
@@ -18,8 +18,9 @@ def get_train_transform(
     execution_partition: str = None,
     random_state: int = 3,
     train: bool = False,
+    transform_text: str = None,
     verbose: int = 1,
-) -> Tuple[LdaMulticore, corpora.Dictionary, str, str]:
+) -> Dict:
     os.environ['TOKENIZERS_PARALLELISM'] = 'false'
 
     model_file_path, dictionary_file_path = __setup_files(execution_partition=execution_partition)
@@ -55,7 +56,7 @@ def get_train_transform(
         corpus = [dictionary.doc2bow(tokens) for tokens in chunked_tokens]
 
         # Train the LDA model
-        lda_model = LdaMulticore(
+        model = LdaMulticore(
             corpus=corpus,
             id2word=dictionary,
             # Increase the number of iterations per pass
@@ -68,16 +69,80 @@ def get_train_transform(
 
         if verbose >= 1:
             print('Saving model...')
-        lda_model.save(model_file_path)
+        model.save(model_file_path)
     else:
-        lda_model = LdaMulticore.load(model_file_path)
+        model = LdaMulticore.load(model_file_path)
         dictionary = corpora.Dictionary.load(dictionary_file_path)
 
     if verbose >= 1:
-        print(f'model.num_topics: {lda_model.num_topics}')
+        print(f'model.num_topics: {model.num_topics}')
         print(f'dictionary.keys: {len(dictionary.keys())}')
 
-    return lda_model, dictionary, model_file_path, dictionary_file_path
+    tokens = None
+    if transform_text:
+        tokens = __chunk_topics(nlp, transform_text, dictionary=dictionary, model=model)
+
+    return dict(
+        dictionary=dictionary,
+        model=model,
+        paths=[model_file_path, dictionary_file_path],
+        tokens=tokens,
+    )
+
+
+def extract_topics(model: LdaMulticore, num_words: int = 8):
+    topics = model.show_topics(num_topics=model.num_topics, num_words=num_words, formatted=False)
+    for topic_num, topic in topics:
+        print(f"Topic: {topic_num}")
+        for word, probability in topic:
+            print(f"    {word}: {probability}")
+
+
+def __chunk_topics(
+    nlp: spacy.lang.en.English,
+    text: str,
+    dictionary: corpora.Dictionary = None,
+    model: LdaMulticore = None,
+) -> List[List[str]]:
+    corpus = []
+    sentences = chunk_sentences(nlp(text))
+    for sentence in sentences:
+        tokens = standardize(nlp(sentence))
+        corpus.append(dictionary.doc2bow(tokens))
+
+    topic_distributions = model.get_document_topics(corpus)
+
+    # Segment the text based on topic shifts
+    groups = []
+    current = []
+    topic_dist_prev = None
+
+    for sentence, topic_dist in zip(sentences, topic_distributions):
+        if topic_dist_prev is None or __significant_topic_shift(topic_dist_prev, topic_dist):
+            if current:
+                groups.append(current)
+                current = []
+
+        current.append(sentence)
+        topic_dist_prev = topic_dist
+
+    if current:
+        groups.append(current)
+
+    return groups
+
+
+def __significant_topic_shift(topic_dist_prev: List[Tuple], topic_dist: List[Tuple]) -> bool:
+    if topic_dist_prev and topic_dist:
+        if len(topic_dist_prev) and \
+                len(topic_dist_prev[0]) and \
+                len(topic_dist) and \
+                len(topic_dist[0]):
+
+            return topic_dist_prev[0] != topic_dist[0] and \
+                abs(topic_dist_prev[0][1] - topic_dist[0][1]) >= 0.1
+
+    return False
 
 
 def __setup_files(execution_partition: str = None) -> Tuple[str, str]:
