@@ -31,7 +31,7 @@ def export(documents: List[List[Union[str, Dict, List[str], List[float]]]], *arg
                     );
                 """)
 
-                documents_stored = []
+                arr = []
 
                 for tup in documents:
                     source_document_id, _document, metadata, chunk_text, _tokens, vector = tup
@@ -74,9 +74,9 @@ def export(documents: List[List[Union[str, Dict, List[str], List[float]]]], *arg
                         metadata_json,
                     ))
 
-                    documents_stored.append(source_document_id)
+                    arr.append(source_document_id)
                     
-                    print(f'{len(documents_stored)}/{len(documents)}')
+                    print(f'{round(100 * len(arr) / len(documents))}% ({len(arr)}/{len(documents)})')
 
                 conn.commit()
         except Exception as err:

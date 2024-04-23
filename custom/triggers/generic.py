@@ -5,7 +5,7 @@ from mage_ai.settings.repo import get_repo_path
 @custom
 def trigger(*args, **kwargs):
     pipeline_uuid = kwargs.get('pipeline_uuid')
-    retrain = kwargs.get('retrain')
+    train = kwargs.get('train')
     trigger_pipeline_uuid = kwargs.get('trigger_pipeline_uuid')
     execution_partition = kwargs.get('execution_partition')
     sample = kwargs.get('sample')
@@ -14,7 +14,7 @@ def trigger(*args, **kwargs):
     print('trigger_pipeline_uuid', trigger_pipeline_uuid)
     print('execution_partition', execution_partition)
     print('sample', sample)
-    print('retrain', retrain)
+    print('train', train)
     
     trigger_pipeline(
         trigger_pipeline_uuid, 
@@ -33,8 +33,8 @@ def trigger(*args, **kwargs):
         return_remote_blocks=True,
         schedule_name=execution_partition,
         variables=dict(
-            retrain=retrain,
             sample=sample,
+            train=train,
         ),
         verbose=False,
     )

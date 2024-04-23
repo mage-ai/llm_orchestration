@@ -48,7 +48,7 @@ def export_data(data, *args, **kwargs):
             # This'll handle the transaction and closing the cursor
             with conn, conn.cursor() as cur:
                 cur.execute("""
-                SELECT vector 
+                SELECT vector
                 FROM embeddings
                 ORDER BY 
                     chunk_text_hash ASC

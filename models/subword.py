@@ -60,8 +60,7 @@ def get_train_transform(
         tokens = model.encode_as_pieces(transform_text)
 
     return dict(
-        dictionary=dictionary,
-        model=lda_model,
+        model=model,
         paths=[model_file_path],
         tokens=tokens,
     )

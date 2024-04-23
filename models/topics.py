@@ -90,12 +90,30 @@ def get_train_transform(
     )
 
 
-def extract_topics(model: LdaMulticore, num_words: int = 8):
-    topics = model.show_topics(num_topics=model.num_topics, num_words=num_words, formatted=False)
-    for topic_num, topic in topics:
-        print(f"Topic: {topic_num}")
-        for word, probability in topic:
-            print(f"    {word}: {probability}")
+def get_topic_for_text(
+    model: LdaMulticore,
+    dictionary: corpora.Dictionary,
+    tokens: List[str],
+    words_per_topic: int = 8,
+) -> Dict:
+    chunk_bow = dictionary.doc2bow(tokens)
+    representation = model[chunk_bow]
+
+    topic_words = []
+    for topic in model.print_topics(num_words=words_per_topic):
+        words = []
+        for word in topic[1].split('+'):
+            parts = word.split('*')
+            words.append(parts[-1].strip().strip('"'))
+        topic_words.append(words)
+
+    topic_id, probability = sorted(representation, key=lambda t: t[1], reverse=True)[0]
+
+    return dict(
+        id=topic_id,
+        probability=probability,
+        words=topic_words[topic_id],
+    )
 
 
 def __chunk_topics(
