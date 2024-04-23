@@ -16,3 +16,5 @@ features:
   notebook_block_output_split_view: true
   operation_history: true
 openai_api_key: "{{ env_var('OPENAI_API_KEY') }}"
+queue_config:
+  concurrency: 9999

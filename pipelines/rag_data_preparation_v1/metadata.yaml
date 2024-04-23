@@ -48,13 +48,13 @@ blocks:
   language: python
   name: rag/data_preparation/distribute_files
   retry_config: null
-  status: executed
+  status: updated
   timeout: null
   type: data_loader
   upstream_blocks:
   - rag/data_preparation/github
   uuid: rag/data_preparation/distribute_files
-- all_upstream_blocks_executed: true
+- all_upstream_blocks_executed: false
   color: null
   configuration: {}
   downstream_blocks:
@@ -72,7 +72,7 @@ blocks:
   upstream_blocks:
   - rag/data_preparation/distribute_files
   uuid: chunking/sentences
-- all_upstream_blocks_executed: true
+- all_upstream_blocks_executed: false
   color: null
   configuration: {}
   downstream_blocks:
@@ -126,7 +126,7 @@ blocks:
   upstream_blocks:
   - embedding/batches
   uuid: data_preparation/reduce/embeddings
-- all_upstream_blocks_executed: true
+- all_upstream_blocks_executed: false
   color: null
   configuration:
     reduce_output: true

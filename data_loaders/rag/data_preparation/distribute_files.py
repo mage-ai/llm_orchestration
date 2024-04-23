@@ -1,6 +1,10 @@
 import os
-from collections import defaultdict
 import pathspec
+
+from collections import defaultdict
+
+from mage_ai.settings.repo import get_repo_path
+
 
 def find_first_gitignore(directory):
     """Searches for the first .gitignore file in the directory tree."""
@@ -82,15 +86,20 @@ def extract_file_paths(data):
 
 
 @data_loader
-def load_data(local_dir, *args, **kwargs):
-    sample = kwargs.get('sample', 2)
+def load_data(*args, **kwargs):
+    local_dir = args[0] if len(args) else os.path.join(
+        get_repo_path(),
+        kwargs.get('local_dir') or '',
+    )
+    buckets = kwargs.get('buckets')
+    sample = kwargs.get('sample')
 
     exclude_patterns = [
         '*.txt',
     ]
     buckets = distribute_into_buckets(
         local_dir, 
-        n_buckets=40, 
+        n_buckets=buckets, 
         include_patterns=['*.mdx'],
         use_gitignore=True, 
         exclude_patterns=exclude_patterns,
@@ -105,10 +114,10 @@ def load_data(local_dir, *args, **kwargs):
             print("------")
 
     arrs = []
-    for bucket in buckets[:sample]:
+    for bucket in buckets:
         files = extract_file_paths(bucket)
-        arrs.append(files[:sample + 1])
+        arrs.append(files)
 
     return [
-        arrs,
+        [ar for ar in arrs if ar],
     ]

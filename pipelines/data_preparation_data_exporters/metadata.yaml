@@ -1,0 +1,170 @@
+blocks:
+- all_upstream_blocks_executed: true
+  color: teal
+  configuration:
+    file_source:
+      path: custom/rag/data_preparation/setup.py
+  downstream_blocks:
+  - remote_blocks/load
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: rag/data_preparation/setup
+  retry_config: null
+  status: updated
+  timeout: null
+  type: custom
+  upstream_blocks: []
+  uuid: rag/data_preparation/setup
+- all_upstream_blocks_executed: false
+  color: null
+  configuration:
+    dynamic: false
+    file_source:
+      path: data_loaders/remote_blocks/load.py
+  downstream_blocks:
+  - export/load/reduce
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: remote_blocks/load
+  retry_config: null
+  status: updated
+  timeout: null
+  type: data_loader
+  upstream_blocks:
+  - rag/data_preparation/setup
+  uuid: remote_blocks/load
+- all_upstream_blocks_executed: false
+  color: null
+  configuration: {}
+  downstream_blocks:
+  - vector_database/pgvector
+  - knowledge_graph/neo4j
+  - documents/store
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: export/load/reduce
+  retry_config: null
+  status: executed
+  timeout: null
+  type: transformer
+  upstream_blocks:
+  - remote_blocks/load
+  uuid: export/load/reduce
+- all_upstream_blocks_executed: false
+  color: null
+  configuration: {}
+  downstream_blocks:
+  - search/vector/index
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: vector_database/pgvector
+  retry_config: null
+  status: updated
+  timeout: null
+  type: data_exporter
+  upstream_blocks:
+  - export/load/reduce
+  uuid: vector_database/pgvector
+- all_upstream_blocks_executed: false
+  color: null
+  configuration: {}
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: search/vector/index
+  retry_config: null
+  status: updated
+  timeout: null
+  type: data_exporter
+  upstream_blocks:
+  - vector_database/pgvector
+  uuid: search/vector/index
+- all_upstream_blocks_executed: false
+  color: null
+  configuration: {}
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: knowledge_graph/neo4j
+  retry_config: null
+  status: updated
+  timeout: null
+  type: data_exporter
+  upstream_blocks:
+  - export/load/reduce
+  uuid: knowledge_graph/neo4j
+- all_upstream_blocks_executed: false
+  color: null
+  configuration: {}
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: documents/store
+  retry_config: null
+  status: executed
+  timeout: null
+  type: data_exporter
+  upstream_blocks:
+  - export/load/reduce
+  uuid: documents/store
+cache_block_output_in_memory: false
+callbacks: []
+concurrency_config: {}
+conditionals:
+- all_upstream_blocks_executed: false
+  color: null
+  configuration:
+    file_source:
+      path: conditionals/database/drivers.py
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: database/drivers
+  retry_config: null
+  status: updated
+  timeout: null
+  type: conditional
+  upstream_blocks:
+  - rag/data_preparation/setup
+  - knowledge_graph/neo4j
+  - vector_database/pgvector
+  - search/vector/index
+  uuid: database/drivers
+created_at: '2024-04-19 07:36:19.972000+00:00'
+data_integration: null
+description: null
+executor_config: {}
+executor_count: 1
+executor_type: null
+extensions: {}
+name: data_preparation_data_exporters
+notification_config: {}
+remote_variables_dir: null
+retry_config: {}
+run_pipeline_in_one_process: false
+settings:
+  triggers: null
+spark_config: {}
+tags: []
+type: python
+uuid: data_preparation_data_exporters
+variables:
+  remote_pipeline_uuid: data_preparation_transformer
+variables_dir: /root/.mage_data/llm_orchestration
+widgets: []

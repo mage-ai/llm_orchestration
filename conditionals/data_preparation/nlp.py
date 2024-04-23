@@ -1,10 +1,17 @@
 import pytextrank
 import spacy
+from nltk.corpus import stopwords
 
-nlp = spacy.load('en_core_web_sm')
-nlp.add_pipe('textrank')
+nlp_spacy = spacy.load('en_core_web_lg')
+nlp_spacy.add_pipe('textrank')
+
+stopwords_set = set(stopwords.words('english'))
 
 
 @factory
-def evaluate_condition(*args, **kwargs):
-    return nlp
+def nlp(*args, **kwargs):
+    return nlp_spacy
+
+@factory
+def stop_words(*args, **kwargs) -> set:
+    return stopwords_set

@@ -1,7 +1,9 @@
 inputs:
   number:
+    options: []
     style:
       input_type: number
+      multiline: null
     type: text_field
   query:
     options: []
@@ -19,8 +21,10 @@ variables:
     description: K nearest neighbors
     input: number
     name: K
+    required: null
     types:
     - integer
+    uuid: null
   query:
     description: null
     input: query

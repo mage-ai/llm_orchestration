@@ -14,11 +14,10 @@ def graph(*args, **kwargs):
     neo4j_user = get_secret_value('NEO4J_USERNAME') or \
         os.getenv('NEO4J_USERNAME', 'neo4j')
     neo4j_password = get_secret_value('NEO4J_PASSWORD') or \
-        os.getenv('NEO4J_PASSWORD', 'password')    
+        os.getenv('NEO4J_PASSWORD', 'password')
     neo4j_driver = GraphDatabase.driver(
-        neo4j_uri, 
+        neo4j_uri,
         auth=(neo4j_user, neo4j_password),
-        
     )
 
     return neo4j_driver
@@ -28,7 +27,7 @@ def graph(*args, **kwargs):
 def vector(*args, **kwargs):
     postgres_host = 'postgres'
     postgres_port = 5432
-    postgres_db = os.getenv('POSTGRES_DB', 'llm_orchestration')
+    postgres_db = os.getenv('POSTGRES_DB', 'llm')
     postgres_password = os.getenv('POSTGRES_PASSWORD', 'password')
     postgres_user = os.getenv('POSTGRES_USER', 'postgres')
 
