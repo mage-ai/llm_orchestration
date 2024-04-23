@@ -2,10 +2,11 @@ from typing import Dict, List, Union
 
 from default_repo.llm_orchestration.models.topics import get_train_transform
 from default_repo.llm_orchestration.utils.chunking import sliding_window
+from default_repo.llm_orchestration.utils.tokenization import standardize
 
 
-def get_topic_for_text(model, dictionary, text: str, words_per_topic: int = 8) -> Dict:
-    chunk_bow = dictionary.doc2bow([text])
+def get_topic_for_text(model, dictionary, tokens: List[str], words_per_topic: int = 8) -> Dict:
+    chunk_bow = dictionary.doc2bow(tokens)
     representation = model[chunk_bow]
 
     topic_words = []
@@ -53,10 +54,10 @@ def transform(documents: List[List[str]], *args, **kwargs):
                 topic_data = get_topic_for_text(
                     model, 
                     dictionary,
-                    chunk,
+                    standardize(nlp(chunk)),
                 )
-
-                print(' '.join([w.replace('\n', ' ').strip() for w in topic_data['words']]))
+                topic = ' '.join([w.replace('\n', ' ').strip() for w in topic_data['words']])
+                metadata['topic'] = topic
 
                 arr.append([
                     document_id,
