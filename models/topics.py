@@ -78,9 +78,14 @@ def get_train_transform(
         print(f'model.num_topics: {model.num_topics}')
         print(f'dictionary.keys: {len(dictionary.keys())}')
 
-    tokens = None
+    tokens = []
     if transform_text:
         tokens = __chunk_topics(nlp, transform_text, dictionary=dictionary, model=model)
+        if not tokens:
+            raise Exception(
+                '[ERROR] topics.model.get_train_transform: no tokens found for text: ' +
+                f'{transform_text}',
+            )
 
     return dict(
         dictionary=dictionary,
@@ -99,8 +104,14 @@ def get_topic_for_text(
     chunk_bow = dictionary.doc2bow(tokens)
     representation = model[chunk_bow]
 
+    if not representation:
+        print(
+            f'[topics.model.get_topic_for_text] No representation for tokens: {tokens}',
+        )
+        return None
+
     topic_words = []
-    for topic in model.print_topics(num_words=words_per_topic):
+    for topic in model.print_topics(num_topics=-1, num_words=words_per_topic):
         words = []
         for word in topic[1].split('+'):
             parts = word.split('*')
@@ -108,6 +119,8 @@ def get_topic_for_text(
         topic_words.append(words)
 
     topic_id, probability = sorted(representation, key=lambda t: t[1], reverse=True)[0]
+
+    print(f'Topic ID: {topic_id} of {len(topic_words)} / {model.num_topics} topics')
 
     return dict(
         id=topic_id,

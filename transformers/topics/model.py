@@ -8,13 +8,13 @@ def transform(documents: List[List[Union[str, Dict]]], *args, **kwargs):
     factory_items_mapping = kwargs.get('factory_items_mapping')
     nlp, _ = factory_items_mapping['data_preparation/nlp']
 
-    paths = get_train_transform(
+    data = get_train_transform(
         nlp,
         documents=[document[1] for document in documents],
         execution_partition=kwargs.get('execution_partition'),
         train=kwargs.get('train', 1) == 1,
-    )['paths']
+    )
 
     return [
-        paths,
+        data,
     ]

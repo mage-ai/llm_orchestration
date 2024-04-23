@@ -28,15 +28,20 @@ def get_train_transform(
     model_file_path = __setup_files(execution_partition=execution_partition)
 
     if train:
-        doc = nlp('\n'.join(documents))
+        words = {}
+        for document in documents:
+            doc = nlp(document)
+            words.update(word_counts(doc))
+
+        word_count = len(words)
         docs_count = len(documents)
-        word_count = len(word_counts(doc))
 
         if not vocab_size:
-            vocab_size = round(min(
-                (word_count/docs_count) * (docs_count**0.5),
-                (word_count/docs_count),
-            ))
+            words_per_document = word_count / docs_count
+            vocab_size = words_per_document * (docs_count**0.5)
+            if vocab_size / words_per_document < 1:
+                vocab_size = words_per_document
+            vocab_size = round(vocab_size)
 
         if verbose >= 1:
             print(
