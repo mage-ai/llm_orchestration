@@ -8,15 +8,8 @@ import numpy as np
 
 from mage_ai.settings.repo import get_repo_path
 
-from default_repo.llm_orchestration.transformers.chunking.semantic import chunk_by_topic
-from default_repo.llm_orchestration.transformers.topics import preprocess_sentences
-from default_repo.llm_orchestration.transformers.tokenization.subword import (
-    combo_tokens,
-    named_entity_recognition,
-    part_of_speech,
-    preprocessing,
-    subword_tokens,
-)
+from default_repo.llm_orchestration.utils.chunking import chunk_sentences
+from default_repo.llm_orchestration.utils.tokenization import embeddings_sum, named_entity_recognition_tokens
 
 
 class Index:
@@ -24,8 +17,9 @@ class Index:
         self.index = None
         self.index_path = index_path or os.path.join(
             get_repo_path(),
-            'vector_database',
-            'index',
+            'assets', 
+            'index', 
+            'vectors',
             'index.faiss',
         )
 
@@ -40,46 +34,12 @@ class Index:
         self.index = faiss.read_index(self.index_path)
 
 
-import nltk.
-
-def sentence_chunker(text, max_tokens_per_chunk=512):
-    """
-    Split text into chunks based on sentence boundaries.
-
-    Args:
-        text (str): The input text to be chunked.
-        max_tokens_per_chunk (int): The maximum number of tokens allowed per chunk.
-
-    Returns:
-        list: A list of text chunks.
-    """
-    sentences = nltk.sent_tokenize(text)
-    chunks = []
-    current_chunk = ""
-    current_tokens = 0
-
-    for sentence in sentences:
-        sentence_tokens = len(nltk.word_tokenize(sentence))
-        if current_tokens + sentence_tokens > max_tokens_per_chunk:
-            chunks.append(current_chunk.strip())
-            current_chunk = sentence + " "
-            current_tokens = sentence_tokens
-        else:
-            current_chunk += sentence + " "
-            current_tokens += sentence_tokens
-
-    if current_chunk:
-        chunks.append(current_chunk.strip())
-
-    return chunks
-
-
 @custom
 def retrieve(*args, **kwargs):
     factory_items_mapping = kwargs.get('factory_items_mapping')
     driver, connection = factory_items_mapping['database/drivers']
-    nlp, stop_words = factory_items_mapping['data_preparation/nlp']
-    _1, _2, openai = factory_items_mapping['embeddings/clients']
+    nlp, _ = factory_items_mapping['data_preparation/nlp']
+    _, _, client = factory_items_mapping['embeddings/clients']
 
     documents_store_dir = kwargs.get(
         'documents_store',
@@ -89,7 +49,7 @@ def retrieve(*args, **kwargs):
     k_nearest_neighbors = kwargs.get('k_nearest_neighbors', 2)
     query = kwargs.get('query', 'dynamic blocks')
     query = """
-    how to clone blocks or replicate them
+    charts for visualizing code
     """
 
     query = query.strip()
@@ -120,25 +80,27 @@ def retrieve(*args, **kwargs):
     if error:
         raise error
 
-    model_file_path = '/home/src/default_repo/llm_orchestration/models/lda'
-    dictionary_file_path = '/home/src/default_repo/llm_orchestration/dictionary/lda'
-    subword_tokenizer = '/home/src/default_repo/llm_orchestration/models/subword_tokenizer'
-
     faiss_index = Index()
     nodes = []
 
     # Chunking
-    sentences = sentence_chunker(query)
+    sentences = chunk_sentences(nlp(query))
     for chunk in sentences:
         print('-------------------------------')
         print(f'chunk: {chunk}')
 
-        tokens = combo_tokens(nlp, subword_tokenizer, stop_words, chunk)
-        print(f'tokens: {tokens}')
+        tokens_text, tokens_type = named_entity_recognition_tokens(nlp(chunk))
+        print(f'tokens_text: {tokens_text}')
+        print(f'tokens_type: {tokens_type}')
         
-        vector = openai.post(tokens)
-        print(f'vector: {vector}')
+        vector_token_text = client.post(tokens_text)
+        vector_token_type = client.post(tokens_type)
+        vector = embeddings_sum([vector_token_text, vector_token_type])
+
+        print(vector)
+        
         D, I = faiss_index.search([vector])
+        print(D, I)
 
         with driver.session() as session:
             for i in range(k_nearest_neighbors):
@@ -187,6 +149,7 @@ def retrieve(*args, **kwargs):
                     ))
 
         print('__________')
+
     # return [
     #     nodes,
     # ]

@@ -27,7 +27,7 @@ def build_index(vectors: List[List[float]]):
 
     index.add(vectors)  # Add vectors to the index
 
-    path = os.path.join(get_repo_path(), 'vector_database', 'index')
+    path = os.path.join(get_repo_path(), 'assets', 'index', 'vectors')
     os.makedirs(path, exist_ok=True)  # Ensure the directory exists
 
     # Write the index to disk
@@ -36,8 +36,9 @@ def build_index(vectors: List[List[float]]):
 
 
 @data_exporter
-def export_data(data, *args, **kwargs):
-    _driver, connection = list(kwargs.get('factory_items_mapping').values())[0]
+def export_data(*args, **kwargs):
+    factory_items_mapping = kwargs.get('factory_items_mapping')
+    _, connection = factory_items_mapping['database/drivers']
 
     error = None
     # This'll handle closing the connection
@@ -58,7 +59,7 @@ def export_data(data, *args, **kwargs):
                 
                 print(f'rows: {len(rows)}')
 
-                build_index([json.loads(row[0]) for row in rows])
+                build_index([row[0] for row in rows])
         except Exception as err:
             error = err
 

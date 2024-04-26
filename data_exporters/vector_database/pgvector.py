@@ -1,12 +1,16 @@
-import json
 import hashlib
+import json
 from contextlib import closing
-from typing import Dict, List, Union
+
+import pandas as pd
 
 
 @data_exporter
-def export(documents: List[List[Union[str, Dict, List[str], List[float]]]], *args, **kwargs):
-    _driver, connection = list(kwargs.get('factory_items_mapping').values())[0]
+def export(df: pd.DataFrame, *args, **kwargs):
+    factory_items_mapping = kwargs.get('factory_items_mapping')
+    _, connection = factory_items_mapping['database/drivers']
+    
+    print(f'df: {len(df)}')
 
     error = None
     # This'll handle closing the connection
@@ -31,12 +35,15 @@ def export(documents: List[List[Union[str, Dict, List[str], List[float]]]], *arg
                     );
                 """)
 
-                arr = []
+                counter = 0
+                for _index, row in df.iterrows():
+                    source_document_id = row['document_id']
+                    document_id = f'document{hash(source_document_id)}'
+                    chunk_text = row['chunk']
+                    metadata = row['metadata']
+                    vector = row['vector']
 
-                for tup in documents:
-                    source_document_id, _document, metadata, chunk_text, _tokens, vector = tup
                     print(source_document_id)
-                    
                     document_id = f'document{hash(source_document_id)}'
 
                     metadata = metadata or {}
@@ -70,13 +77,13 @@ def export(documents: List[List[Union[str, Dict, List[str], List[float]]]], *arg
                         document_id_hash,
                         chunk_text, 
                         document_id, 
-                        [round(val, 6) for val in vector],
+                        [round(val, 10) for val in vector],
                         metadata_json,
                     ))
 
-                    arr.append(source_document_id)
+                    counter += 1
                     
-                    print(f'{round(100 * len(arr) / len(documents))}% ({len(arr)}/{len(documents)})')
+                    print(f'{counter}/{len(df)})')
 
                 conn.commit()
         except Exception as err:

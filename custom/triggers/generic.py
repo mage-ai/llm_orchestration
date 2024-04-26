@@ -4,7 +4,8 @@ from mage_ai.settings.repo import get_repo_path
 
 @custom
 def trigger(*args, **kwargs):
-    pipeline_uuid = kwargs.get('pipeline_uuid')
+    remote_block_uuid = kwargs.get('remote_block_uuid')
+    pipeline_uuid = kwargs.get('remote_pipeline_uuid') or kwargs.get('pipeline_uuid')
     train = kwargs.get('train')
     trigger_pipeline_uuid = kwargs.get('trigger_pipeline_uuid')
     execution_partition = kwargs.get('execution_partition')
@@ -24,7 +25,7 @@ def trigger(*args, **kwargs):
         poll_timeout=None,
         remote_blocks=[
             dict(
-                block_uuid='export/mapping/files', 
+                block_uuid=remote_block_uuid, 
                 execution_partition=execution_partition, 
                 pipeline_uuid=pipeline_uuid, 
                 repo_path=get_repo_path(),

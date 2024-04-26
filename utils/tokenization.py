@@ -1,6 +1,18 @@
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
+import numpy as np
 import spacy
+
+
+def named_entity_recognition_tokens(doc: spacy.tokens.doc.Doc) -> Tuple[List[str], List[str]]:
+    tokens_text = []
+    tokens_type = []
+
+    for token in doc:
+        tokens_text.append(token.text)
+        tokens_type.append(token.ent_type_ or '<EMPTY>')
+
+    return tokens_text, tokens_type
 
 
 def standardize(
@@ -37,3 +49,40 @@ def word_counts(doc: spacy.tokens.doc.Doc) -> Dict:
         words[token] += 1
 
     return words
+
+
+def element_wise_addition(
+    embeddings_a: List[List[float]],
+    embeddings_b: List[List[float]],
+) -> List[List[float]]:
+    return np.array(embeddings_a) + np.array(embeddings_b)
+
+
+def element_wise_multiplication(
+    embeddings_a: List[List[float]],
+    embeddings_b: List[List[float]],
+) -> List[List[float]]:
+    return np.array(embeddings_a) * np.array(embeddings_b)
+
+
+def embeddings_concatenate(matrix: List[List[float]]) -> List[float]:
+    return np.concatenate(matrix, axis=0)
+
+
+def embeddings_mean(matrix: List[List[float]]) -> List[float]:
+    return np.mean(matrix, axis=0)
+
+
+def embeddings_sum(matrix: List[List[float]]) -> List[float]:
+    return np.sum(matrix, axis=0)
+
+
+def embeddings_weighted_average(
+    matrix: List[List[float]],
+    weights: List[float],
+) -> List[float]:
+    return np.average(matrix, axis=0, weights=weights)
+
+
+def embeddings_max_pooling(matrix: List[List[float]]) -> List[float]:
+    return np.max(matrix, axis=0)

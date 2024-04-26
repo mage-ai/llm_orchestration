@@ -1,17 +1,24 @@
+from typing import Dict, List
 
-from typing import List
+import pandas as pd
 
 
 @data_loader
-def load_data(document_ids: List[str], *args, **kwargs):
-    arr = []
-
-    for document_id in document_ids:
+def load_data(data: List[Dict], *args, **kwargs):
+    rows = []
+    for row in data:
+        document_id = row['document_id']
         with open(document_id, 'r') as f:
-            arr.append([
+            rows.append([
                 document_id,
                 f.read(),
                 {},
             ])
 
-    return [arr]
+    df = pd.DataFrame(rows, columns=[
+        'document_id',
+        'document',
+        'metadata',
+    ])
+
+    return df

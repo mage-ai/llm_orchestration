@@ -24,7 +24,7 @@ blocks:
   configuration:
     reduce_output: true
   downstream_blocks:
-  - export/mapping/files
+  - reduce/dataframe
   executor_config: null
   executor_type: local_python
   has_callback: false
@@ -39,22 +39,25 @@ blocks:
   uuid: load/mapping/files
 - all_upstream_blocks_executed: true
   color: null
-  configuration: {}
+  configuration:
+    file_path: data_exporters/reduce/dataframe.py
+    file_source:
+      path: data_exporters/reduce/dataframe.py
   downstream_blocks:
   - triggers/generic
   executor_config: null
   executor_type: local_python
   has_callback: false
   language: python
-  name: export/mapping/files
+  name: reduce/dataframe
   retry_config: null
-  status: updated
+  status: executed
   timeout: null
   type: data_exporter
   upstream_blocks:
   - load/mapping/files
-  uuid: export/mapping/files
-- all_upstream_blocks_executed: false
+  uuid: reduce/dataframe
+- all_upstream_blocks_executed: true
   color: teal
   configuration: {}
   downstream_blocks: []
@@ -68,7 +71,7 @@ blocks:
   timeout: null
   type: custom
   upstream_blocks:
-  - export/mapping/files
+  - reduce/dataframe
   uuid: triggers/generic
 cache_block_output_in_memory: false
 callbacks: []
@@ -95,9 +98,10 @@ uuid: data_preparation_data_loader
 variables:
   buckets: 40
   local_dir: documents/code/mage-ai-master/docs
+  remote_block_uuid: reduce/dataframe
   sample: 0
   train: 1
   trigger_pipeline_uuid: data_preparation_transformer
-  verbose: 1
+  verbose: 0
 variables_dir: /root/.mage_data/llm_orchestration
 widgets: []

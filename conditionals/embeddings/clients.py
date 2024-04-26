@@ -11,6 +11,7 @@ from urllib3.exceptions import InsecureRequestWarning
 import numpy as np
 import replicate
 from replicate.deployment import DeploymentsPredictions
+from transformers import BertModel
 
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 REPLICATE_API_TOKEN = os.getenv('REPLICATE_API_TOKEN')
@@ -217,3 +218,8 @@ def replicate_prediction(*args, **kwargs):
 @factory
 def openai(*args, **kwargs):
     return OpenAIEmbedding
+
+
+@factory
+def bert_model(*args, **kwargs):
+    return BertModel.from_pretrained('bert-base-uncased')

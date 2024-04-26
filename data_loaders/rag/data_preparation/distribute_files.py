@@ -1,7 +1,8 @@
 import os
 import pathspec
-
 from collections import defaultdict
+
+import pandas as pd
 
 from mage_ai.settings.repo import get_repo_path
 
@@ -116,8 +117,9 @@ def load_data(*args, **kwargs):
     arrs = []
     for bucket in buckets:
         files = extract_file_paths(bucket)
-        arrs.append(files)
+        df = pd.DataFrame(files, columns=['document_id'])
+        arrs.append(df)
 
     return [
-        [ar for ar in arrs if ar],
+        arrs,
     ]

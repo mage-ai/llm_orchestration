@@ -1,14 +1,14 @@
-from typing import List, Union
+import pandas as pd
 
 
 @data_exporter
-def export(documents: List[List[Union[str, str, str, List[str], List[float]]]], *args, **kwargs):
-    driver, conn = list(kwargs.get('factory_items_mapping').values())[0]
+def export(df: pd.DataFrame, *args, **kwargs):
+    factory_items_mapping = kwargs.get('factory_items_mapping')
+    driver, _ = factory_items_mapping['database/drivers']
 
     reset = int(kwargs.get('reset', 1)) == 1
 
-    documents_stored = []
-    documents_failed = []
+    print(f'df: {len(df)}')
 
     if reset:
         with driver.session() as session:
@@ -16,8 +16,12 @@ def export(documents: List[List[Union[str, str, str, List[str], List[float]]]], 
             session.write_transaction(lambda tx: tx.run('MATCH (n) DETACH DELETE n'))
 
     with driver.session() as session:
-        for source_document_id, _document, _metadata, text, _tokens, embedding_vector in documents:
-            document_id = f'document{hash(source_document_id)}'
+        for _index, row in df.iterrows():
+            document_id = row['document_id']
+            chunk = row['chunk']
+            vector = row['vector']
+
+            document_id = f'document{hash(document_id)}'
 
             # Create or find a Document node
             session.write_transaction(lambda tx: tx.run(
@@ -43,8 +47,8 @@ def export(documents: List[List[Union[str, str, str, List[str], List[float]]]], 
                 RETURN c
                 """,
                 document_id=document_id,
-                embedding=embedding_vector,
-                text=text,
+                embedding=vector,
+                text=chunk,
             ))
 
             # Relate Chunk to the Document node.
@@ -59,18 +63,7 @@ def export(documents: List[List[Union[str, str, str, List[str], List[float]]]], 
                 })
                 CREATE (d)-[:CONTAINS]->(c)
                 """,
-                text=text,
                 document_id=document_id,
+                text=chunk,
                 
             ))
-
-            documents_stored.append(source_document_id)
-
-            print(f'{len(documents_stored)}/{len(documents)}')
-
-    print(f'documents_stored: {len(documents_stored)}')
-
-    return [
-        documents_stored,
-        documents_failed,
-    ]

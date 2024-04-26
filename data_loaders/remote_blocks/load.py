@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 
 from mage_ai.data_preparation.models.block.remote.models import RemoteBlock
 from mage_ai.settings.repo import get_repo_path
@@ -8,21 +9,22 @@ from mage_ai.settings.repo import get_repo_path
 def load_data(*args, **kwargs):
     sample = int(kwargs.get('sample', 2))
     dry_run = sample >= 1
-    pipeline_uuid = kwargs.get('remote_pipeline_uuid')
 
     outputs = kwargs.get('remote_blocks')
 
     if not outputs:
+        block_uuid = kwargs.get('remote_source_block_uuid')
+        pipeline_uuid = kwargs.get('remote_source_pipeline_uuid')
+        
         outputs = [
             RemoteBlock.load(
-                block_uuid='export/mapping/files',
+                block_uuid=block_uuid,
                 pipeline_uuid=pipeline_uuid,
                 repo_path=get_repo_path(),
             ).get_outputs(),
         ]
 
-    documents_count = 0
-    documents_list = []
+    df = pd.DataFrame()
 
     if dry_run:
         outputs = outputs[:sample]
@@ -30,24 +32,12 @@ def load_data(*args, **kwargs):
     print(f'sample: {sample}')
     print(f'dry_run: {dry_run}')
     print(f'outputs: {len(outputs)}')
-    for buckets in outputs:
-        print(f'buckets: {len(buckets)}')
+    
+    for dfs in outputs:
+        print(f'dfs: {len(dfs)}')
 
-        if dry_run:
-            buckets = buckets[:sample]
+        df = pd.concat([df] + dfs)
 
-        for bucket in buckets:
-            print(f'bucket: {len(bucket)}')
-            
-            if dry_run:
-                bucket = bucket[:sample]
+    print(f'df: {len(df)}')
 
-            documents_count += len(bucket)
-            documents_list.append(bucket)
-
-    print(f'documents_count: {documents_count}')
-    print(f'documents_list: {len(documents_list)}')
-
-    return [
-        documents_list,
-    ]
+    return df

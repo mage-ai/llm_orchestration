@@ -12,34 +12,17 @@ blocks:
   language: python
   name: rag/data_preparation/setup
   retry_config: null
-  status: updated
+  status: executed
   timeout: null
   type: custom
   upstream_blocks: []
   uuid: rag/data_preparation/setup
-- all_upstream_blocks_executed: false
+- all_upstream_blocks_executed: true
   color: null
   configuration:
     dynamic: false
     file_source:
       path: data_loaders/remote_blocks/load.py
-  downstream_blocks:
-  - export/load/reduce
-  executor_config: null
-  executor_type: local_python
-  has_callback: false
-  language: python
-  name: remote_blocks/load
-  retry_config: null
-  status: updated
-  timeout: null
-  type: data_loader
-  upstream_blocks:
-  - rag/data_preparation/setup
-  uuid: remote_blocks/load
-- all_upstream_blocks_executed: false
-  color: null
-  configuration: {}
   downstream_blocks:
   - vector_database/pgvector
   - knowledge_graph/neo4j
@@ -48,15 +31,15 @@ blocks:
   executor_type: local_python
   has_callback: false
   language: python
-  name: export/load/reduce
+  name: remote_blocks/load
   retry_config: null
   status: executed
   timeout: null
-  type: transformer
+  type: data_loader
   upstream_blocks:
-  - remote_blocks/load
-  uuid: export/load/reduce
-- all_upstream_blocks_executed: false
+  - rag/data_preparation/setup
+  uuid: remote_blocks/load
+- all_upstream_blocks_executed: true
   color: null
   configuration: {}
   downstream_blocks:
@@ -71,7 +54,7 @@ blocks:
   timeout: null
   type: data_exporter
   upstream_blocks:
-  - export/load/reduce
+  - remote_blocks/load
   uuid: vector_database/pgvector
 - all_upstream_blocks_executed: false
   color: null
@@ -83,13 +66,13 @@ blocks:
   language: python
   name: search/vector/index
   retry_config: null
-  status: updated
+  status: executed
   timeout: null
   type: data_exporter
   upstream_blocks:
   - vector_database/pgvector
   uuid: search/vector/index
-- all_upstream_blocks_executed: false
+- all_upstream_blocks_executed: true
   color: null
   configuration: {}
   downstream_blocks: []
@@ -103,9 +86,9 @@ blocks:
   timeout: null
   type: data_exporter
   upstream_blocks:
-  - export/load/reduce
+  - remote_blocks/load
   uuid: knowledge_graph/neo4j
-- all_upstream_blocks_executed: false
+- all_upstream_blocks_executed: true
   color: null
   configuration: {}
   downstream_blocks: []
@@ -119,7 +102,7 @@ blocks:
   timeout: null
   type: data_exporter
   upstream_blocks:
-  - export/load/reduce
+  - remote_blocks/load
   uuid: documents/store
 cache_block_output_in_memory: false
 callbacks: []
@@ -165,6 +148,7 @@ tags: []
 type: python
 uuid: data_preparation_data_exporters
 variables:
-  remote_pipeline_uuid: data_preparation_transformer
+  remote_source_block_uuid: reduce/dataframe
+  remote_source_pipeline_uuid: data_preparation_transformer
 variables_dir: /root/.mage_data/llm_orchestration
 widgets: []

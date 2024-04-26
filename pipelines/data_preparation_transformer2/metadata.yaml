@@ -1,0 +1,189 @@
+blocks:
+- all_upstream_blocks_executed: true
+  color: null
+  configuration:
+    dynamic: true
+  downstream_blocks:
+  - chunking/data_preparation
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: remote_blocks/load
+  retry_config: null
+  status: updated
+  timeout: null
+  type: data_loader
+  upstream_blocks: []
+  uuid: remote_blocks/load
+- all_upstream_blocks_executed: false
+  color: null
+  configuration:
+    file_source:
+      path: transformers/chunking/semantic.py
+  downstream_blocks:
+  - tokenization/data_preparation
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: chunking/data_preparation
+  retry_config: null
+  status: updated
+  timeout: null
+  type: transformer
+  upstream_blocks:
+  - remote_blocks/load
+  - remote_blocks/load
+  uuid: chunking/data_preparation
+- all_upstream_blocks_executed: false
+  color: null
+  configuration: {}
+  downstream_blocks:
+  - embeddings/data_preparation
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: tokenization/data_preparation
+  retry_config: null
+  status: updated
+  timeout: null
+  type: transformer
+  upstream_blocks:
+  - chunking/data_preparation
+  uuid: tokenization/data_preparation
+- all_upstream_blocks_executed: false
+  color: null
+  configuration:
+    reduce_output: true
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: embeddings/data_preparation
+  retry_config: null
+  status: executed
+  timeout: null
+  type: transformer
+  upstream_blocks:
+  - tokenization/data_preparation
+  uuid: embeddings/data_preparation
+- all_upstream_blocks_executed: false
+  color: null
+  configuration:
+    file_source:
+      path: data_exporters/export/mapping/files.py
+  downstream_blocks:
+  - triggers/generic
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: export/mapping/files
+  retry_config: null
+  status: updated
+  timeout: null
+  type: data_exporter
+  upstream_blocks:
+  - embeddings/data_preparation
+  uuid: export/mapping/files
+- all_upstream_blocks_executed: false
+  color: teal
+  configuration:
+    file_source:
+      path: custom/triggers/generic.py
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: triggers/generic
+  retry_config: null
+  status: executed
+  timeout: null
+  type: custom
+  upstream_blocks:
+  - export/mapping/files
+  uuid: triggers/generic
+- all_upstream_blocks_executed: true
+  color: null
+  configuration: {}
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: test
+  retry_config: null
+  status: updated
+  timeout: null
+  type: scratchpad
+  upstream_blocks: []
+  uuid: test
+cache_block_output_in_memory: false
+callbacks: []
+concurrency_config:
+  block_run_limit: 100
+conditionals:
+- all_upstream_blocks_executed: false
+  color: null
+  configuration: {}
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: embeddings/clients
+  retry_config: null
+  status: updated
+  timeout: null
+  type: conditional
+  upstream_blocks:
+  - embeddings/data_preparation
+  uuid: embeddings/clients
+- all_upstream_blocks_executed: false
+  color: null
+  configuration:
+    file_source:
+      path: conditionals/data_preparation/nlp.py
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: data_preparation/nlp
+  retry_config: null
+  status: updated
+  timeout: null
+  type: conditional
+  upstream_blocks:
+  - tokenization/data_preparation
+  - chunking/data_preparation
+  uuid: data_preparation/nlp
+created_at: '2024-04-19 05:19:05.533161+00:00'
+data_integration: null
+description: null
+executor_config: {}
+executor_count: 1
+executor_type: null
+extensions: {}
+name: data_preparation/transformer2
+notification_config: {}
+remote_variables_dir: null
+retry_config: {}
+run_pipeline_in_one_process: false
+settings:
+  triggers: null
+spark_config: {}
+tags: []
+type: python
+uuid: data_preparation_transformer2
+variables:
+  remote_pipeline_uuid: data_preparation_data_loader
+  sample: 10
+  train: 1
+  trigger_pipeline_uuid: data_preparation_data_exporters
+variables_dir: /root/.mage_data/llm_orchestration
+widgets: []
