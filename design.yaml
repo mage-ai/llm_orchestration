@@ -1,0 +1,22 @@
+components:
+  header:
+    media:
+      url: https://raw.githubusercontent.com/mage-ai/assets/563c193dac28a258303ae2462601f9992a158ba9/mascots/water/casting.svg
+pages:
+  pipelines:
+    edit:
+      buttons:
+        block:
+          add:
+            items:
+              - global_data_product
+              - markdown
+              - data_loader
+            items_more:
+              - custom
+              - transformer
+              - data_exporter
+              - templates/list
+              - templates/new
+              - sensor
+              - dbt

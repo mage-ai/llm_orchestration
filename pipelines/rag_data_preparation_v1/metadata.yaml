@@ -1,0 +1,310 @@
+blocks:
+- all_upstream_blocks_executed: true
+  color: teal
+  configuration:
+    file_source:
+      path: custom/rag/data_preparation/setup.py
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: rag/data_preparation/setup
+  retry_config: null
+  status: executed
+  timeout: null
+  type: custom
+  upstream_blocks: []
+  uuid: rag/data_preparation/setup
+- all_upstream_blocks_executed: true
+  color: null
+  configuration:
+    file_source:
+      path: data_loaders/rag/data_preparation/github.py
+  downstream_blocks:
+  - rag/data_preparation/distribute_files
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: rag/data_preparation/github
+  retry_config: null
+  status: executed
+  timeout: null
+  type: data_loader
+  upstream_blocks: []
+  uuid: rag/data_preparation/github
+- all_upstream_blocks_executed: true
+  color: null
+  configuration:
+    dynamic: true
+    file_source:
+      path: data_loaders/rag/data_preparation/distribute_files.py
+  downstream_blocks:
+  - chunking/sentences
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: rag/data_preparation/distribute_files
+  retry_config: null
+  status: updated
+  timeout: null
+  type: data_loader
+  upstream_blocks:
+  - rag/data_preparation/github
+  uuid: rag/data_preparation/distribute_files
+- all_upstream_blocks_executed: false
+  color: null
+  configuration: {}
+  downstream_blocks:
+  - data_preparation/reduce/chunks
+  - tokenization/speech
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: chunking/sentences
+  retry_config: null
+  status: executed
+  timeout: null
+  type: transformer
+  upstream_blocks:
+  - rag/data_preparation/distribute_files
+  uuid: chunking/sentences
+- all_upstream_blocks_executed: false
+  color: null
+  configuration: {}
+  downstream_blocks:
+  - embedding/batches
+  - data_preparation/reduce/tokenization
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: tokenization/speech
+  retry_config: null
+  status: updated
+  timeout: null
+  type: transformer
+  upstream_blocks:
+  - chunking/sentences
+  uuid: tokenization/speech
+- all_upstream_blocks_executed: false
+  color: null
+  configuration:
+    reduce_output: false
+  downstream_blocks:
+  - data_preparation/reduce/embeddings
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: embedding/batches
+  retry_config: null
+  status: executed
+  timeout: null
+  type: transformer
+  upstream_blocks:
+  - tokenization/speech
+  uuid: embedding/batches
+- all_upstream_blocks_executed: false
+  color: null
+  configuration:
+    reduce_output: true
+  downstream_blocks:
+  - combine_reduced_output
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: data_preparation/reduce/embeddings
+  retry_config: null
+  status: executed
+  timeout: null
+  type: data_exporter
+  upstream_blocks:
+  - embedding/batches
+  uuid: data_preparation/reduce/embeddings
+- all_upstream_blocks_executed: false
+  color: null
+  configuration:
+    reduce_output: true
+  downstream_blocks:
+  - combine_reduced_output
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: data_preparation/reduce/chunks
+  retry_config: null
+  status: executed
+  timeout: null
+  type: data_exporter
+  upstream_blocks:
+  - chunking/sentences
+  uuid: data_preparation/reduce/chunks
+- all_upstream_blocks_executed: false
+  color: null
+  configuration:
+    reduce_output: true
+  downstream_blocks:
+  - combine_reduced_output
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: data_preparation/reduce/tokenization
+  retry_config: null
+  status: executed
+  timeout: null
+  type: data_exporter
+  upstream_blocks:
+  - tokenization/speech
+  uuid: data_preparation/reduce/tokenization
+- all_upstream_blocks_executed: false
+  color: null
+  configuration: {}
+  downstream_blocks:
+  - data_preparation/knowledge_graph
+  - data_preparation/vector_database/pgvector
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: combine_reduced_output
+  retry_config: null
+  status: executed
+  timeout: null
+  type: data_exporter
+  upstream_blocks:
+  - data_preparation/reduce/chunks
+  - data_preparation/reduce/tokenization
+  - data_preparation/reduce/embeddings
+  uuid: combine_reduced_output
+- all_upstream_blocks_executed: true
+  color: null
+  configuration: {}
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: markdown
+  name: data_preparation/knowledge_graph_doc
+  retry_config: null
+  status: updated
+  timeout: null
+  type: markdown
+  upstream_blocks: []
+  uuid: data_preparation/knowledge_graph_doc
+- all_upstream_blocks_executed: false
+  color: null
+  configuration:
+    file_source:
+      path: data_exporters/data_preparation/knowledge_graph.py
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: data_preparation/knowledge_graph
+  retry_config: null
+  status: executed
+  timeout: null
+  type: data_exporter
+  upstream_blocks:
+  - combine_reduced_output
+  uuid: data_preparation/knowledge_graph
+- all_upstream_blocks_executed: false
+  color: null
+  configuration: {}
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: data_preparation/vector_database/pgvector
+  retry_config: null
+  status: executed
+  timeout: null
+  type: data_exporter
+  upstream_blocks:
+  - combine_reduced_output
+  uuid: data_preparation/vector_database/pgvector
+cache_block_output_in_memory: false
+callbacks: []
+concurrency_config: {}
+conditionals:
+- all_upstream_blocks_executed: false
+  color: null
+  configuration: {}
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: data_preparation/embeddings
+  retry_config: null
+  status: updated
+  timeout: null
+  type: conditional
+  upstream_blocks:
+  - embedding/batches
+  uuid: data_preparation/embeddings
+- all_upstream_blocks_executed: false
+  color: null
+  configuration: {}
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: database/drivers
+  retry_config: null
+  status: updated
+  timeout: null
+  type: conditional
+  upstream_blocks:
+  - rag/data_preparation/setup
+  - data_preparation/knowledge_graph
+  - data_preparation/vector_database/pgvector
+  uuid: database/drivers
+- all_upstream_blocks_executed: false
+  color: null
+  configuration: {}
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: data_preparation/nlp
+  retry_config: null
+  status: updated
+  timeout: null
+  type: conditional
+  upstream_blocks:
+  - chunking/sentences
+  - tokenization/speech
+  uuid: data_preparation/nlp
+created_at: '2024-04-15 06:27:51.287460+00:00'
+data_integration: null
+description: null
+executor_config: {}
+executor_count: 1
+executor_type: null
+extensions: {}
+name: RAG data preparation v1
+notification_config: {}
+remote_variables_dir: null
+retry_config: {}
+run_pipeline_in_one_process: false
+settings:
+  triggers: null
+spark_config: {}
+tags: []
+type: python
+uuid: rag_data_preparation_v1
+variables:
+  dry_run: 0
+variables_dir: /root/.mage_data/llm_orchestration
+widgets: []
