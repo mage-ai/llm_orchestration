@@ -5,12 +5,12 @@ from typing import Callable, Dict, List
 
 class Transformers:
     class Model(str, Enum):
-        MODEL_BERT = 'bert-large-uncased'
-        MODEL_CODE_LLAMA = 'Phind/Phind-CodeLlama-34B-v2'
-        MODEL_DEEPSEEKER_BASE = 'deepseek-ai/deepseek-coder-6.7b-base'
-        MODEL_DEEPSEEKER_INSTRUCT = 'deepseek-ai/deepseek-coder-6.7b-instruct'
-        MODEL_INSTRUCTOR = 'hkunlp/instructor-xl'
-        MODEL_OPEN_CODE_INTERPRETER = 'm-a-p/OpenCodeInterpreter-DS-33B'
+        BERT = 'bert-large-uncased'
+        CODE_LLAMA = 'Phind/Phind-CodeLlama-34B-v2'
+        DEEPSEEKER_BASE = 'deepseek-ai/deepseek-coder-6.7b-base'
+        DEEPSEEKER_INSTRUCT = 'deepseek-ai/deepseek-coder-6.7b-instruct'
+        INSTRUCTOR = 'hkunlp/instructor-xl'
+        OPEN_CODE_INTERPRETER = 'm-a-p/OpenCodeInterpreter-DS-33B'
 
     def __init__(cls, model: Model = Model.MODEL_BERT):
         cls.model = model
