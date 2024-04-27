@@ -1,3 +1,5 @@
+import json
+
 import pandas as pd
 
 
@@ -5,23 +7,25 @@ import pandas as pd
 def export(df: pd.DataFrame, *args, **kwargs):
     factory_items_mapping = kwargs.get('factory_items_mapping')
     driver, _ = factory_items_mapping['database/drivers']
+    iterate = factory_items_mapping['helpers/lists'][0]
 
     reset = int(kwargs.get('reset', 1)) == 1
-
-    print(f'df: {len(df)}')
-
     if reset:
         with driver.session() as session:
             print('Resetting...')
             session.write_transaction(lambda tx: tx.run('MATCH (n) DETACH DELETE n'))
 
     with driver.session() as session:
-        for _index, row in df.iterrows():
-            document_id = row['document_id']
-            chunk = row['chunk']
-            vector = row['vector']
+        counter = 0
 
-            document_id = f'document{hash(document_id)}'
+        for index, row in iterate(df):
+            source_document_id = row['document_id']
+            document_id = f'document{hash(source_document_id)}'
+            
+            print(f'{index}: {source_document_id}')
+            
+            chunk = row['chunk']
+            vector = json.dumps(row['vector'])
 
             # Create or find a Document node
             session.write_transaction(lambda tx: tx.run(
@@ -38,7 +42,7 @@ def export(df: pd.DataFrame, *args, **kwargs):
                 """
                 MERGE (c:Chunk {
                     document_id: $document_id
-                    , embedding: $embedding
+                    , embeddings: $embeddings
                     , text: $text
                 })
                 ON CREATE SET 
@@ -47,7 +51,7 @@ def export(df: pd.DataFrame, *args, **kwargs):
                 RETURN c
                 """,
                 document_id=document_id,
-                embedding=vector,
+                embeddings=vector,
                 text=chunk,
             ))
 
@@ -65,5 +69,8 @@ def export(df: pd.DataFrame, *args, **kwargs):
                 """,
                 document_id=document_id,
                 text=chunk,
-                
             ))
+
+            counter += 1
+        
+        print(f'items: {counter}')

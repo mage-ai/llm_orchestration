@@ -8,6 +8,43 @@ def chunk_sentences(doc: spacy.tokens.doc.Doc) -> List[str]:
     return [sent.text.strip() for sent in doc.sents]
 
 
+def chunk_sentences_with_overlap(
+    nlp,
+    text: str,
+    max_length: int = 256,
+    overlap: int = 64,
+) -> List[str]:
+    doc = nlp(text)
+    sentences = [sentence.text for sentence in doc.sents]
+    chunks, current_chunk_tokens, current_chunk_sentences = [], [], []
+    current_len = 0
+
+    for sentence in sentences:
+        sentence_tokens = nlp(sentence)
+        sentence_length = len(sentence_tokens)
+
+        if current_len + sentence_length > max_length:
+            # If adding the current sentence exceeds max_length, finalize the current chunk
+            chunks.append(' '.join(current_chunk_sentences))
+            # Start new chunk considering overlap
+            # Move back 'overlap' tokens to start the new chunk, keeping semantics
+            overlap_tokens = current_chunk_tokens[-overlap:]
+            current_chunk_sentences = [' '.join(token.text for token in overlap_tokens)]
+            current_chunk_tokens = overlap_tokens
+            current_len = len(overlap_tokens)
+
+        # Add the current sentence to the chunk
+        current_chunk_sentences.append(sentence)
+        current_chunk_tokens.extend(sentence_tokens)
+        current_len += sentence_length
+
+    # Make sure to add the last chunk if there is one
+    if current_chunk_sentences:
+        chunks.append(' '.join(current_chunk_sentences))
+
+    return chunks
+
+
 def sliding_window(
     doc: spacy.tokens.doc.Doc,
     chunk_size: int = 512,

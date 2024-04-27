@@ -1,9 +1,7 @@
 import json
 from typing import Dict, List
 
-import numpy as np
 import pandas as pd
-import torch
 
 from default_repo.llm_orchestration.utils.tokenization import (
     embeddings_concatenate, 
@@ -15,11 +13,10 @@ from default_repo.llm_orchestration.utils.tokenization import (
 @custom
 def transform_custom(data: List[Dict], *args, **kwargs):
     factory_items_mapping = kwargs.get('factory_items_mapping')
-    model, _tokenizer = factory_items_mapping['models/bert']
+    _, model = factory_items_mapping['models/transformers']
 
     count = len(data)
     print(f'count: {count}')
-
 
     rows = []
     for index, row in enumerate(data):
@@ -35,12 +32,14 @@ def transform_custom(data: List[Dict], *args, **kwargs):
             print(err)
             raise err
 
-        vector = embeddings_concatenate([
-            embeddings_mean(matrix),
-            embeddings_max_pooling(matrix),
-        ])
+        # vector = embeddings_concatenate([
+        #     embeddings_mean(matrix),
+        #     embeddings_max_pooling(matrix),
+        # ])
 
-        row['vector'] = vector.tolist()
+        # row['vector'] = vector.tolist()
+
+        row['vector'] = matrix
 
         rows.append(row)
 

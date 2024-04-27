@@ -30,7 +30,7 @@ conditionals:
   language: python
   name: database/drivers
   retry_config: null
-  status: not_executed
+  status: updated
   timeout: null
   type: conditional
   upstream_blocks:
@@ -39,39 +39,22 @@ conditionals:
 - all_upstream_blocks_executed: true
   color: null
   configuration:
+    file_path: /home/src/default_repo/llm_orchestration/conditionals/models/transformers.py
     file_source:
-      path: conditionals/data_preparation/nlp.py
+      path: conditionals/models/transformers.py
   downstream_blocks: []
   executor_config: null
   executor_type: local_python
   has_callback: false
   language: python
-  name: data_preparation/nlp
+  name: models/transformers
   retry_config: null
   status: not_executed
   timeout: null
   type: conditional
   upstream_blocks:
   - search/query
-  uuid: data_preparation/nlp
-- all_upstream_blocks_executed: true
-  color: null
-  configuration:
-    file_source:
-      path: conditionals/embeddings/clients.py
-  downstream_blocks: []
-  executor_config: null
-  executor_type: local_python
-  has_callback: false
-  language: python
-  name: embeddings/clients
-  retry_config: null
-  status: not_executed
-  timeout: null
-  type: conditional
-  upstream_blocks:
-  - search/query
-  uuid: embeddings/clients
+  uuid: models/transformers
 created_at: '2024-04-17 09:05:34.084883+00:00'
 data_integration: null
 description: RAG inference pipeline generic.

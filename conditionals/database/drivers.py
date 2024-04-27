@@ -9,12 +9,9 @@ from mage_ai.data_preparation.shared.secrets import get_secret_value
 
 @factory
 def graph(*args, **kwargs):
-    neo4j_uri = get_secret_value('NEO4J_URI') or \
-        os.getenv('NEO4J_URI', 'neo4j://neo4j:7687')
-    neo4j_user = get_secret_value('NEO4J_USERNAME') or \
-        os.getenv('NEO4J_USERNAME', 'neo4j')
-    neo4j_password = get_secret_value('NEO4J_PASSWORD') or \
-        os.getenv('NEO4J_PASSWORD', 'password')
+    neo4j_uri = os.getenv('NEO4J_URI', 'neo4j://neo4j:7687')
+    neo4j_user = os.getenv('NEO4J_USERNAME', 'neo4j')
+    neo4j_password = os.getenv('NEO4J_PASSWORD', 'password')
     neo4j_driver = GraphDatabase.driver(
         neo4j_uri,
         auth=(neo4j_user, neo4j_password),

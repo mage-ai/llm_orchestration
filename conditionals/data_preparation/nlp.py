@@ -1,14 +1,14 @@
-import pytextrank
+# import pytextrank
 import spacy
-from transformers import BertTokenizer
-from nltk.corpus import stopwords
+# from transformers import BertTokenizer
+# from nltk.corpus import stopwords
 
 nlp_spacy = spacy.load('en_core_web_lg')
-nlp_spacy.add_pipe('textrank')
+# nlp_spacy.add_pipe('textrank')
 
-stopwords_set = set(stopwords.words('english'))
+# stopwords_set = set(stopwords.words('english'))
 
-bert_tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+# bert_tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
 
 @factory
@@ -18,9 +18,11 @@ def nlp(*args, **kwargs):
 
 @factory
 def stop_words(*args, **kwargs) -> set:
-    return stopwords_set
+    pass
+    # return stopwords_set
 
 
 @factory
 def tokenizer(*args, **kwargs):
-    return bert_tokenizer
+    pass
+    # return bert_tokenizer

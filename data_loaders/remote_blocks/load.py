@@ -25,6 +25,7 @@ def load_data(*args, **kwargs):
         ]
 
     df = pd.DataFrame()
+    arr = []
 
     if dry_run:
         outputs = outputs[:sample]
@@ -36,8 +37,30 @@ def load_data(*args, **kwargs):
     for dfs in outputs:
         print(f'dfs: {len(dfs)}')
 
-        df = pd.concat([df] + dfs)
+        if len(dfs) >= 1 and isinstance(dfs[0], list):
+            for df_list in dfs:
+                print(type(df_list), len(df_list), type(df_list[0]))
+                
+                if len(df_list) >= 1:
+                    item = df_list[0]
 
-    print(f'df: {len(df)}')
+                    if isinstance(item, list) and \
+                            len(item) >= 1 and \
+                            isinstance(item[0], dict):
+                            
+                        for item_list in df_list:
+                            arr.append(pd.DataFrame(item_list))
+                    elif isinstance(item, dict):
+                        arr.append(pd.DataFrame(df_list))
+                    else:
+                        arr += df_list
+        else:
+            df = pd.concat([df] + dfs)
+
+    if len(arr) >= 1:
+        print(f'arr: {len(arr)}')
+        return arr
+
+    print(f'df:  {len(df)}')
 
     return df
