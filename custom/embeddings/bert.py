@@ -1,4 +1,5 @@
-from typing import Dict
+import json
+from typing import Dict, List
 
 import numpy as np
 import pandas as pd
@@ -12,29 +13,28 @@ from default_repo.llm_orchestration.utils.tokenization import (
 
 
 @custom
-def transform_custom(df: pd.DataFrame, *args, **kwargs):
+def transform_custom(data: List[Dict], *args, **kwargs):
     factory_items_mapping = kwargs.get('factory_items_mapping')
     model, _tokenizer = factory_items_mapping['models/bert']
 
-    count = len(df)
+    count = len(data)
     print(f'count: {count}')
 
+
     rows = []
-    for index, row in df.iterrows():
-        token_ids = torch.from_numpy(np.array(row['tokens']))
-        attention_mask = torch.from_numpy(np.array(row['attention_mask']))
+    for index, row in enumerate(data):
+        document_id = row['document_id']
+        chunk = row['chunk'].strip()
 
-        # Feed the token ids and attention mask to the BERT model
-        with torch.no_grad():
-            outputs = model(
-                token_ids, 
-                attention_mask=attention_mask,
-            )
+        try:
+            matrix = model([chunk])['embeddings'][0]
+        except Exception as err:
+            print(f'document_id: {document_id}')
+            print(f'chunk:')
+            print(json.dumps(chunk))
+            print(err)
+            raise err
 
-        # Get the embeddings for each subword token
-        embeddings = outputs.last_hidden_state
-
-        matrix = embeddings[0].numpy()
         vector = embeddings_concatenate([
             embeddings_mean(matrix),
             embeddings_max_pooling(matrix),

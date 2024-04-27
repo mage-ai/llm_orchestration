@@ -100,7 +100,6 @@ variables:
   local_dir: documents/code/mage-ai-master/docs
   remote_block_uuid: reduce/dataframe
   sample: 0
-  train: 1
   trigger_pipeline_uuid: data_preparation_transformer
   verbose: 0
 variables_dir: /root/.mage_data/llm_orchestration

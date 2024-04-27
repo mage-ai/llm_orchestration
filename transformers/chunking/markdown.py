@@ -19,26 +19,26 @@ def transform(df: pd.DataFrame, *args, **kwargs):
             if sample >= 1 and len(rows) >= sample:
                 break
 
-            rows.append([
-                document_id,
-                document,
-                metadata,
-                chunk,
-            ])
+            rows.append(dict(
+                document_id=document_id,
+                document=document,
+                metadata=metadata,
+                chunk=chunk,
+            ))
 
     print(f'rows: {len(rows)}')
     
     dfs = []
     buckets = bucket_items(
         rows, 
-        max_num_buckets=1000, 
-        max_items_per_bucket=100,
+        max_num_buckets=10000, 
+        max_items_per_bucket=20,
         override_on_max=True,
     )
     print(f'buckets: {len(buckets)}')
 
     for bucket in buckets:
-        dfs.append(pd.DataFrame(bucket, columns=df.columns.to_list() + ['chunk']))
+        dfs.append(bucket)
 
     return [
         dfs,

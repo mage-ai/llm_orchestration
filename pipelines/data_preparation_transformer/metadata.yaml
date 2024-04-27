@@ -19,57 +19,24 @@ blocks:
   type: data_loader
   upstream_blocks: []
   uuid: remote_blocks/load
-- all_upstream_blocks_executed: true
-  color: null
-  configuration:
-    data_integration: {}
-  downstream_blocks: []
-  executor_config: null
-  executor_type: local_python
-  has_callback: false
-  language: yaml
-  name: daring waterfall
-  retry_config: null
-  status: not_executed
-  timeout: null
-  type: data_loader
-  upstream_blocks: []
-  uuid: daring_waterfall
 - all_upstream_blocks_executed: false
   color: null
   configuration:
     dynamic: true
-  downstream_blocks:
-  - tokenization/bert
-  executor_config: null
-  executor_type: local_python
-  has_callback: false
-  language: python
-  name: chunking/markdown
-  retry_config: null
-  status: executed
-  timeout: null
-  type: transformer
-  upstream_blocks:
-  - remote_blocks/load
-  uuid: chunking/markdown
-- all_upstream_blocks_executed: false
-  color: teal
-  configuration: {}
   downstream_blocks:
   - embeddings/bert
   executor_config: null
   executor_type: local_python
   has_callback: false
   language: python
-  name: tokenization/bert
+  name: chunking/markdown
   retry_config: null
-  status: executed
+  status: updated
   timeout: null
-  type: custom
+  type: transformer
   upstream_blocks:
-  - chunking/markdown
-  uuid: tokenization/bert
+  - remote_blocks/load
+  uuid: chunking/markdown
 - all_upstream_blocks_executed: false
   color: pink
   configuration:
@@ -81,12 +48,16 @@ blocks:
   has_callback: false
   language: python
   name: embeddings/bert
-  retry_config: null
+  retry_config:
+    delay: 60
+    exponential_backoff: true
+    max_delay: 300
+    retries: 3
   status: updated
   timeout: null
   type: custom
   upstream_blocks:
-  - tokenization/bert
+  - chunking/markdown
   uuid: embeddings/bert
 - all_upstream_blocks_executed: false
   color: null
@@ -124,10 +95,25 @@ blocks:
   upstream_blocks:
   - reduce/dataframe
   uuid: triggers/generic
+- all_upstream_blocks_executed: true
+  color: null
+  configuration: {}
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: little ranger
+  retry_config: null
+  status: updated
+  timeout: null
+  type: scratchpad
+  upstream_blocks: []
+  uuid: little_ranger
 cache_block_output_in_memory: false
 callbacks: []
 concurrency_config:
-  block_run_limit: 10
+  block_run_limit: 100
 conditionals:
 - all_upstream_blocks_executed: false
   color: null
@@ -143,7 +129,6 @@ conditionals:
   timeout: null
   type: conditional
   upstream_blocks:
-  - tokenization/bert
   - embeddings/bert
   uuid: models/bert
 created_at: '2024-04-25 01:17:08.062834+00:00'

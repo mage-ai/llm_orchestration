@@ -10,7 +10,10 @@ import numpy as np
 from mage_ai.settings.repo import get_repo_path
 
 
-def build_index(vectors: List[List[float]]):
+def build_index(vectors: List[Union[str, List[float]]]):
+    if vectors and isinstance(vectors[0], str):
+        vectors = [json.loads(v) for v in vectors]
+
     vectors = np.vstack(vectors)   # Stack all vectors into a NumPy array
     dim = vectors.shape[1]         # Number of dimensions of each vector
     nlist = min(100, len(vectors)) # This means that the index will partition the vector space into 100 distinct cells.

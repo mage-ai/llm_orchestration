@@ -13,5 +13,4 @@ documents/
 logs/
 mage-ai.db
 mage_data/
-models/
 secrets/
