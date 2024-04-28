@@ -44,8 +44,30 @@ class Transformers:
 
 
 @factory
-def transformers(*args, **kwargs) -> Callable[Transformers]
-    def __build(model: Transformers.Model = Transformers.Model.MODEL_BERT):
-        return Transformers(model=model)
+def bert(*args, **kwargs) -> Transformers
+    return Transformers(Transformers.Model.BERT)
 
-    return __build(*args, **kwargs)
+
+@factory
+def code_llama(*args, **kwargs) -> Transformers
+    return Transformers(Transformers.Model.CODE_LLAMA)
+
+
+@factory
+def deepseeker_base(*args, **kwargs) -> Transformers
+    return Transformers(Transformers.Model.DEEPSEEKER_BASE)
+
+
+@factory
+def deepseeker_instruct(*args, **kwargs) -> Transformers
+    return Transformers(Transformers.Model.DEEPSEEKER_INSTRUCT)
+
+
+@factory
+def instructor(*args, **kwargs) -> Transformers
+    return Transformers(Transformers.Model.INSTRUCTOR)
+
+
+@factory
+def open_code_interpreter(*args, **kwargs) -> Transformers
+    return Transformers(Transformers.Model.OPEN_CODE_INTERPRETER)

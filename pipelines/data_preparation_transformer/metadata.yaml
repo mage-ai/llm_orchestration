@@ -7,7 +7,7 @@ blocks:
     file_source:
       path: data_loaders/remote_blocks/load.py
   downstream_blocks:
-  - chunking/markdown
+  - chunking/data_preparation
   executor_config: null
   executor_type: local_python
   has_callback: false
@@ -24,19 +24,19 @@ blocks:
   configuration:
     dynamic: true
   downstream_blocks:
-  - embeddings/bert
+  - embeddings/data_preparation
   executor_config: null
   executor_type: local_python
   has_callback: false
   language: python
-  name: chunking/markdown
+  name: chunking/data_preparation
   retry_config: null
   status: updated
   timeout: null
   type: transformer
   upstream_blocks:
   - remote_blocks/load
-  uuid: chunking/markdown
+  uuid: chunking/data_preparation
 - all_upstream_blocks_executed: false
   color: pink
   configuration:
@@ -47,7 +47,7 @@ blocks:
   executor_type: local_python
   has_callback: false
   language: python
-  name: embeddings/bert
+  name: embeddings/data_preparation
   retry_config:
     delay: 60
     exponential_backoff: true
@@ -57,8 +57,8 @@ blocks:
   timeout: null
   type: custom
   upstream_blocks:
-  - chunking/markdown
-  uuid: embeddings/bert
+  - chunking/data_preparation
+  uuid: embeddings/data_preparation
 - all_upstream_blocks_executed: false
   color: null
   configuration: {}
@@ -74,7 +74,7 @@ blocks:
   timeout: null
   type: data_exporter
   upstream_blocks:
-  - embeddings/bert
+  - embeddings/data_preparation
   uuid: reduce/dataframe
 - all_upstream_blocks_executed: false
   color: null
@@ -116,7 +116,7 @@ conditionals:
   timeout: null
   type: conditional
   upstream_blocks:
-  - chunking/markdown
+  - chunking/data_preparation
   uuid: data_preparation/nlp
 - all_upstream_blocks_executed: false
   color: null
@@ -134,7 +134,7 @@ conditionals:
   timeout: null
   type: conditional
   upstream_blocks:
-  - embeddings/bert
+  - embeddings/data_preparation
   uuid: models/transformers
 created_at: '2024-04-25 01:17:08.062834+00:00'
 data_integration: null

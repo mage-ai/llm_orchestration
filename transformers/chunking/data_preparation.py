@@ -1,36 +1,65 @@
 from typing import Dict, List, Union
 
-from default_repo.llm_orchestration.models.topics import get_topic_for_text, get_train_transform
-from default_repo.llm_orchestration.utils.chunking import chunk_markdown, sliding_window
-from default_repo.llm_orchestration.utils.tokenization import standardize
+import pandas as pd
+
+from default_repo.llm_orchestration.utils.chunking import chunk_sentences_with_overlap
+from default_repo.llm_orchestration.utils.cleaner import clean_html_and_add_spaces
+from default_repo.llm_orchestration.utils.grouping import bucket_items
+from default_repo.llm_orchestration.utils.markdown import remove_markdown_keep_text, remove_markdown_metadata
 
 
 @transformer
-def transform(documents: List[List[str]], *args, **kwargs):
+def transform(df: pd.DataFrame, *args, **kwargs):
     factory_items_mapping = kwargs.get('factory_items_mapping')
-    nlp = factory_items_mapping['data_preparation/nlp'][0]
+    nlp, _, _ = factory_items_mapping['data_preparation/nlp']
+    sample = int(kwargs.get('sample', 2))
 
-    print(len(documents))
+    print(f'df: {len(df)}')
+    
+    rows = []
+    for _index, row in df.iterrows():
+        if sample >= 1 and len(rows) >= sample:
+            break
 
-    arr = []
-    counter = 0
-    for document_id, document, metadata in documents:
-        print(f'document_id: {document_id}')
+        document_id, document, metadata = row
         
-        chunks = chunk_markdown(document)
-        print(f'chunks: {len(chunks)}')
+        text = remove_markdown_metadata(document)
+        text = clean_html_and_add_spaces(text)
+        text = remove_markdown_keep_text(text)
+        chunks = chunk_sentences_with_overlap(
+            nlp,
+            text,
+            max_length=512,
+            overlap=128,
+        )
+
         for chunk in chunks:
-            arr.append([
-                document_id,
-                document,
-                metadata,
-                chunk,
-            ])
+            rows.append(dict(
+                document_id=document_id,
+                document=document,
+                metadata=metadata,
+                chunk=chunk,
+            ))
 
-        
-        counter += 1
-        print(f'{round(100 * counter / len(documents))}% ({counter}/{len(documents)})')
+            if sample >= 1:
+                print(f'sample: {len(rows)}/{sample}')
+                if len(rows) >= sample:
+                    break
+
+    print(f'rows: {len(rows)}')
+    
+    dfs = []
+    buckets = bucket_items(
+        rows, 
+        max_num_buckets=10000, 
+        max_items_per_bucket=20,
+        override_on_max=True,
+    )
+    print(f'buckets: {len(buckets)}')
+
+    for bucket in buckets:
+        dfs.append(bucket)
 
     return [
-        arr,
+        dfs,
     ]

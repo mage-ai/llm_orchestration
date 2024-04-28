@@ -1,6 +1,11 @@
-from typing import List
+from typing import List, Union
 
 import numpy as np
+
+from default_repo.llm_orchestration.utils.tokenization import embeddings_concatenate
+from default_repo.llm_orchestration.utils.tokenization import embeddings_max_pooling
+from default_repo.llm_orchestration.utils.tokenization import embeddings_mean
+from default_repo.llm_orchestration.utils.tokenization import embeddings_sum
 
 
 def flatten(matrix: List[List[float]], dimensions: int) -> List[float]:
@@ -38,3 +43,15 @@ def flatten(matrix: List[List[float]], dimensions: int) -> List[float]:
         )
 
     return padded.flatten().astype(np.float64)
+
+
+def aggregate(matrix: Union[np.array, List[List[float]]]) -> List[float]:
+    if isinstance(matrix, list):
+        matrix = np.array(matrix)
+
+    vector = embeddings_concatenate([
+        embeddings_mean(matrix),
+        embeddings_max_pooling(matrix),
+    ])
+
+    return vector
