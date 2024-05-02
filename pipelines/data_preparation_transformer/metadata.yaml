@@ -14,12 +14,12 @@ blocks:
   language: python
   name: remote_blocks/load
   retry_config: null
-  status: executed
+  status: updated
   timeout: null
   type: data_loader
   upstream_blocks: []
   uuid: remote_blocks/load
-- all_upstream_blocks_executed: true
+- all_upstream_blocks_executed: false
   color: null
   configuration:
     dynamic: true

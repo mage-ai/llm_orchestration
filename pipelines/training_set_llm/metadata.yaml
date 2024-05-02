@@ -1,0 +1,68 @@
+blocks:
+- all_upstream_blocks_executed: true
+  color: null
+  configuration:
+    dynamic: true
+    file_path: data_loaders/remote_blocks/load.py
+    file_source:
+      path: data_loaders/remote_blocks/load.py
+  downstream_blocks:
+  - topics/model
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: remote_blocks/load
+  retry_config: null
+  status: executed
+  timeout: null
+  type: data_loader
+  upstream_blocks: []
+  uuid: remote_blocks/load
+- all_upstream_blocks_executed: true
+  color: null
+  configuration:
+    file_source:
+      path: transformers/topics/model.py
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: topics/model
+  retry_config: null
+  status: updated
+  timeout: null
+  type: transformer
+  upstream_blocks:
+  - remote_blocks/load
+  uuid: topics/model
+cache_block_output_in_memory: false
+callbacks: []
+concurrency_config: {}
+conditionals: []
+created_at: '2024-05-01 08:28:59.123845+00:00'
+data_integration: null
+description: Training set to fine tune LLMs.
+executor_config: {}
+executor_count: 1
+executor_type: null
+extensions: {}
+name: training set/LLM
+notification_config: {}
+remote_variables_dir: null
+retry_config: {}
+run_pipeline_in_one_process: false
+settings:
+  triggers: null
+spark_config: {}
+tags:
+- llm
+type: python
+uuid: training_set_llm
+variables:
+  remote_source_block_uuid: reduce/dataframe
+  remote_source_pipeline_uuid: data_preparation_data_loader
+  sample: 40
+variables_dir: /root/.mage_data/llm_orchestration
+widgets: []

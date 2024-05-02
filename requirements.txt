@@ -8,6 +8,7 @@ faiss-cpu==1.8.0
 gensim==4.3.2
 hnswlib==0.8.0
 neo4j==5.19.0
+openai==1.25.0
 # python -m nltk.downloader stopwords punkt wordnet
 # nltk==3.8.1
 pgvector==0.2.5

@@ -8,7 +8,6 @@ from mage_ai.settings.repo import get_repo_path
 @data_loader
 def load_data(*args, **kwargs):
     sample = int(kwargs.get('sample', 2))
-    dry_run = sample >= 1
 
     outputs = kwargs.get('remote_blocks')
 
@@ -26,12 +25,8 @@ def load_data(*args, **kwargs):
 
     df = pd.DataFrame()
     arr = []
-
-    if dry_run:
-        outputs = outputs[:sample]
     
-    print(f'sample: {sample}')
-    print(f'dry_run: {dry_run}')
+    print(f'sample:  {sample}')
     print(f'outputs: {len(outputs)}')
     
     for dfs in outputs:
@@ -59,8 +54,16 @@ def load_data(*args, **kwargs):
 
     if len(arr) >= 1:
         print(f'arr: {len(arr)}')
+        if sample >= 1:
+            return arr[:sample]
+            
         return arr
 
     print(f'df:  {len(df)}')
+
+    if sample >= 1:
+        df = df.iloc[:sample]
+        print(f'df:  {len(df)}')
+        return df
 
     return df

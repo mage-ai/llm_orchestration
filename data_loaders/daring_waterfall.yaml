@@ -1,7 +1,0 @@
-config:
-  database: null
-  host: null
-  password: null
-  port: 27017
-  user: null
-source: mongodb
