@@ -19,5 +19,5 @@ pytextrank==3.3.0
 # sentencepiece==0.2.0
 spacy>=3.0.0,<4.0.0
 torch==2.2.2
-transformers==4.39.3
+transformers==4.48.0
 # voyageai==0.2.2
